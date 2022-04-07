@@ -89,7 +89,7 @@ for epoch in range(start_epoch, opt.num_epochs):
 
     im_saver.visualize_batch(model, image, label, cur_iter)
     timer(epoch, cur_iter)
-    utils.save_networks(opt, cur_iter, model)
+    # utils.save_networks(opt, cur_iter, model)
     utils.save_networks(opt, cur_iter, model, latest=True)
     if epoch % 2 == 0 and cur_iter > 0 and opt.rank == 0:
         is_best = fid_computer.update(model, cur_iter)
