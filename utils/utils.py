@@ -52,6 +52,7 @@ class timer():
         self.prev_epoch = 0
         self.num_epochs = opt.num_epochs
         self.file_name = os.path.join(opt.checkpoints_dir, opt.name, "progress.txt")
+        self.opt = opt
 
     def __call__(self, epoch, cur_iter):
         if cur_iter != 0:
