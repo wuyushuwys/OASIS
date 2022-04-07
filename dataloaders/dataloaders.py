@@ -18,7 +18,8 @@ def get_dataloaders(opt):
     file = __import__("dataloaders."+dataset_name)
     dataset_train = file.__dict__[dataset_name].__dict__[dataset_name](opt, for_metrics=False)
     dataset_val   = file.__dict__[dataset_name].__dict__[dataset_name](opt, for_metrics=True)
-    print("Created %s, size train: %d, size val: %d" % (dataset_name, len(dataset_train), len(dataset_val)))
+    if opt.rank == 0:
+        print("Created %s, size train: %d, size val: %d" % (dataset_name, len(dataset_train), len(dataset_val)))
     train_sampler = torch.utils.data.distributed.DistributedSampler(dataset_train)
 
     dataloader_train = torch.utils.data.DataLoader(dataset_train,
