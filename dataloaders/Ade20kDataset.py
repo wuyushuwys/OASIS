@@ -53,8 +53,9 @@ class Ade20kDataset(torch.utils.data.Dataset):
         assert image.size == label.size
         # resize
         new_width, new_height = (self.opt.load_size, self.opt.load_size)
-        image = TR.functional.resize(image, (new_width, new_height), Image.InterpolationMode.BICUBIC)
-        label = TR.functional.resize(label, (new_width, new_height), Image.InterpolationMode.NEAREST)
+        image = TR.functional.resize(image, (new_width, new_height), TR.InterpolationMode.BICUBIC)
+        label = TR.functional.resize(label, (new_width, new_height), TR.InterpolationMode.NEAREST)
+
         # crop
         crop_x = random.randint(0, np.maximum(0, new_width -  self.opt.crop_size))
         crop_y = random.randint(0, np.maximum(0, new_height - self.opt.crop_size))
