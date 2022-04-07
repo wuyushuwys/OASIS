@@ -23,8 +23,6 @@ def read_arguments(train=True):
 
 def add_all_arguments(parser, train):
     #--- general options ---
-    # parser.add_argument('--local_rank', default=0, type=int, help='local_rank')
-    # parser.add_argument('--world_size', default=4, type=int, help='world size')
     parser.add_argument('--dist-url', default='env://', type=str, help='url used to set up distributed training')
     parser.add_argument('--dist-backend', default='nccl', type=str, help='distributed backend')
     parser.add_argument('--name', type=str, default='label2coco', help='name of the experiment. It decides where to store samples and models')

@@ -35,7 +35,8 @@ visualizer_losses = utils.losses_saver(opt)
 losses_computer = losses.losses_computer(opt)
 dataloader, dataloader_val, train_sampler = dataloaders.get_dataloaders(opt)
 im_saver = utils.image_saver(opt)
-fid_computer = fid_pytorch(opt, dataloader_val)
+if opt.rank == 0:
+    fid_computer = fid_pytorch(opt, dataloader_val)
 
 # --- create models ---#
 model = models.OASIS_model(opt)
@@ -100,9 +101,10 @@ for epoch in range(start_epoch, opt.num_epochs):
 utils.update_EMA(model, cur_iter, dataloader, opt, force_run_stats=True)
 utils.save_networks(opt, cur_iter, model)
 utils.save_networks(opt, cur_iter, model, latest=True)
-is_best = fid_computer.update(model, cur_iter)
-if is_best:
-    utils.save_networks(opt, cur_iter, model, best=True)
+if opt.rank == 0:
+    is_best = fid_computer.update(model, cur_iter)
+    if is_best:
+        utils.save_networks(opt, cur_iter, model, best=True)
 
 if opt.rank == 0:
     print("The training has successfully finished")

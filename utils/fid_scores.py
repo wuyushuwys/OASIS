@@ -20,13 +20,14 @@ class fid_pytorch():
         block_idx = InceptionV3.BLOCK_INDEX_BY_DIM[self.dims]
         self.model_inc = InceptionV3([block_idx])
         if opt.gpu_ids != "-1":
-            self.model_inc.cuda()
+            self.model_inc.to(opt.local_rank)
         self.val_dataloader = dataloader_val
         self.m1, self.s1 = self.compute_statistics_of_val_path(dataloader_val)
         self.best_fid = 99999999
         self.path_to_save = os.path.join(self.opt.checkpoints_dir, self.opt.name, "FID")
         Path(self.path_to_save).mkdir(parents=True, exist_ok=True)
 
+    @torch.no_grad
     def compute_statistics_of_val_path(self, dataloader_val):
         if self.opt.rank == 0:
             print("--- Now computing Inception activations for real set ---")
@@ -36,6 +37,7 @@ class fid_pytorch():
             print("--- Finished FID stats for real set ---")
         return mu, sigma
 
+    @torch.no_grad
     def accumulate_inception_activations(self):
         pool, logits, labels = [], [], []
         self.model_inc.eval()
@@ -49,6 +51,7 @@ class fid_pytorch():
                 pool += [pool_val]
         return torch.cat(pool, 0)
 
+    @torch.no_grad
     def compute_fid_with_valid_path(self, netG, netEMA):
         pool, logits, labels = [], [], []
         self.model_inc.eval()
