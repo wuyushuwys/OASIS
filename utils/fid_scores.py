@@ -50,7 +50,6 @@ class fid_pytorch():
                 pool += [pool_val]
         return torch.cat(pool, 0)
 
-    @torch.no_grad
     def compute_fid_with_valid_path(self, netG, netEMA):
         pool, logits, labels = [], [], []
         self.model_inc.eval()
