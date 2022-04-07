@@ -28,10 +28,12 @@ class fid_pytorch():
         Path(self.path_to_save).mkdir(parents=True, exist_ok=True)
 
     def compute_statistics_of_val_path(self, dataloader_val):
-        print("--- Now computing Inception activations for real set ---")
+        if self.opt.rank == 0:
+            print("--- Now computing Inception activations for real set ---")
         pool = self.accumulate_inception_activations()
         mu, sigma = torch.mean(pool, 0), torch_cov(pool, rowvar=False)
-        print("--- Finished FID stats for real set ---")
+        if self.opt.rank == 0:
+            print("--- Finished FID stats for real set ---")
         return mu, sigma
 
     def accumulate_inception_activations(self):

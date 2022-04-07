@@ -11,7 +11,8 @@ import os
 opt = config.read_arguments(train=True)
 
 if opt.gpu_ids != "-1":
-    local_rank = opt.local_rank
+    local_rank = int(os.environ["LOCAL_RANK"])
+    opt.local_rank = local_rank
     opt.world_size = int(os.environ["WORLD_SIZE"])
     opt.rank = local_rank
     device = local_rank
@@ -89,4 +90,5 @@ is_best = fid_computer.update(model, cur_iter)
 if is_best:
     utils.save_networks(opt, cur_iter, model, best=True)
 
-print("The training has successfully finished")
+if opt.rank == 0:
+    print("The training has successfully finished")

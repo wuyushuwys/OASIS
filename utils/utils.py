@@ -61,9 +61,10 @@ class timer():
         self.prev_time = time.time()
         self.prev_epoch = cur_iter
 
-        with open(self.file_name, "a") as log_file:
-            log_file.write('[epoch %d/%d - iter %d], time:%.3f \n' % (epoch, self.num_epochs, cur_iter, avg))
-        print('[epoch %d/%d - iter %d], time:%.3f' % (epoch, self.num_epochs, cur_iter, avg))
+        if self.opt.rank == 0:
+            with open(self.file_name, "a") as log_file:
+                log_file.write('[epoch %d/%d - iter %d], time:%.3f \n' % (epoch, self.num_epochs, cur_iter, avg))
+            print('[epoch %d/%d - iter %d], time:%.3f' % (epoch, self.num_epochs, cur_iter, avg))
         return avg
 
 
