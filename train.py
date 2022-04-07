@@ -7,8 +7,11 @@ from utils.fid_scores import fid_pytorch
 import config
 import os
 
+from config import print_options, save_options
+
 # --- read options ---#
-opt = config.read_arguments(train=True)
+opt, parser = config.read_arguments(train=True)
+
 
 if opt.gpu_ids != "-1":
     local_rank = int(os.environ["LOCAL_RANK"])
@@ -24,6 +27,8 @@ if opt.gpu_ids != "-1":
 else:
     opt.rank = 0
 
+print_options(opt, parser)
+save_options(opt, parser)
 # --- create utils ---#
 timer = utils.timer(opt)
 visualizer_losses = utils.losses_saver(opt)

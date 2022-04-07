@@ -18,10 +18,7 @@ def read_arguments(train=True):
     if train:
         opt.loaded_latest_iter = 0 if not opt.continue_train else load_iter(opt)
     utils.fix_seed(opt.seed)
-    print_options(opt, parser)
-    if train:
-        save_options(opt, parser)
-    return opt
+    return opt, parser
 
 
 def add_all_arguments(parser, train):
