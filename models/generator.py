@@ -29,10 +29,8 @@ class OASIS_Generator(nn.Module):
 
     def forward(self, input, z=None):
         seg = input
-        if self.opt.gpu_ids != "-1":
-            seg.cuda()
+        seg.to(input.device)
         if not self.opt.no_3dnoise:
-            # dev = seg.get_device() if self.opt.gpu_ids != "-1" else "cpu"
             z = torch.randn(seg.size(0), self.opt.z_dim, dtype=torch.float32).to(input.device)
             z = z.view(z.size(0), self.opt.z_dim, 1, 1)
             z = z.expand(z.size(0), self.opt.z_dim, seg.size(2), seg.size(3))

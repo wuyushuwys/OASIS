@@ -49,8 +49,8 @@ class residual_block_D(nn.Module):
         self.first = first
         self.learned_shortcut = (fin != fout)
         fmiddle = fout
-        norm_layer = norms.get_spectral_norm(opt)
-        norm_layer = nn.utils.spectral_norm()
+        # norm_layer = norms.get_spectral_norm(opt)
+        norm_layer = nn.utils.spectral_norm
         if first:
             self.conv1 = nn.Sequential(norm_layer(nn.Conv2d(fin, fmiddle, 3, 1, 1)))
         else:
