@@ -7,9 +7,13 @@ class OASIS_Discriminator(nn.Module):
     def __init__(self, opt):
         super().__init__()
         self.opt = opt
-        sp_norm = norms.get_spectral_norm(opt)
+        # sp_norm = norms.get_spectral_norm(opt)
+        channels_D = opt.channels_D
         output_channel = opt.semantic_nc + 1 # for N+1 loss
-        self.channels = [3, 128, 128, 256, 256, 512, 512]
+        self.channels = [3,
+                         int(2 * channels_D), int(2 * channels_D),
+                         int(4 * channels_D), int(4 * channels_D),
+                         int(8 * channels_D), int(8 * channels_D)]
         self.body_up   = nn.ModuleList([])
         self.body_down = nn.ModuleList([])
         # encoder part
@@ -46,6 +50,7 @@ class residual_block_D(nn.Module):
         self.learned_shortcut = (fin != fout)
         fmiddle = fout
         norm_layer = norms.get_spectral_norm(opt)
+        norm_layer = nn.utils.spectral_norm()
         if first:
             self.conv1 = nn.Sequential(norm_layer(nn.Conv2d(fin, fmiddle, 3, 1, 1)))
         else:

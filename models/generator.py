@@ -8,7 +8,7 @@ class OASIS_Generator(nn.Module):
     def __init__(self, opt):
         super().__init__()
         self.opt = opt
-        sp_norm = norms.get_spectral_norm(opt)
+        # sp_norm = norms.get_spectral_norm(opt)
         ch = opt.channels_G
         self.channels = [16*ch, 16*ch, 16*ch, 8*ch, 4*ch, 2*ch, 1*ch]
         self.init_W, self.init_H = self.compute_latent_vector_size(opt)
@@ -32,8 +32,8 @@ class OASIS_Generator(nn.Module):
         if self.opt.gpu_ids != "-1":
             seg.cuda()
         if not self.opt.no_3dnoise:
-            dev = seg.get_device() if self.opt.gpu_ids != "-1" else "cpu"
-            z = torch.randn(seg.size(0), self.opt.z_dim, dtype=torch.float32, device=dev)
+            # dev = seg.get_device() if self.opt.gpu_ids != "-1" else "cpu"
+            z = torch.randn(seg.size(0), self.opt.z_dim, dtype=torch.float32).to(input.device)
             z = z.view(z.size(0), self.opt.z_dim, 1, 1)
             z = z.expand(z.size(0), self.opt.z_dim, seg.size(2), seg.size(3))
             seg = torch.cat((z, seg), dim = 1)
@@ -44,7 +44,7 @@ class OASIS_Generator(nn.Module):
             if i < self.opt.num_res_blocks-1:
                 x = self.up(x)
         x = self.conv_img(F.leaky_relu(x, 2e-1))
-        x = F.tanh(x)
+        x = torch.tanh(x)
         return x
 
 
@@ -54,11 +54,17 @@ class ResnetBlock_with_SPADE(nn.Module):
         self.opt = opt
         self.learned_shortcut = (fin != fout)
         fmiddle = min(fin, fout)
-        sp_norm = norms.get_spectral_norm(opt)
-        self.conv_0 = sp_norm(nn.Conv2d(fin, fmiddle, kernel_size=3, padding=1))
-        self.conv_1 = sp_norm(nn.Conv2d(fmiddle, fout, kernel_size=3, padding=1))
+        # sp_norm = norms.get_spectral_norm(opt)
+        # self.conv_0 = sp_norm(nn.Conv2d(fin, fmiddle, kernel_size=3, padding=1))
+        # self.conv_1 = sp_norm(nn.Conv2d(fmiddle, fout, kernel_size=3, padding=1))
+        self.conv_0 = nn.Conv2d(fin, fmiddle, kernel_size=3, padding=1)
+        self.bn0 = nn.BatchNorm2d(fmiddle, affine=False)
+        self.conv_1 = nn.Conv2d(fmiddle, fout, kernel_size=3, padding=1)
+        self.bn1 = nn.BatchNorm2d(fout, affine=False)
         if self.learned_shortcut:
-            self.conv_s = sp_norm(nn.Conv2d(fin, fout, kernel_size=1, bias=False))
+            # self.conv_s = sp_norm(nn.Conv2d(fin, fout, kernel_size=1, bias=False))
+            self.conv_s = nn.Conv2d(fin, fout, kernel_size=1, bias=False)
+            self.bn_s = nn.BatchNorm2d(fout)
 
         spade_conditional_input_dims = opt.semantic_nc
         if not opt.no_3dnoise:
@@ -75,7 +81,13 @@ class ResnetBlock_with_SPADE(nn.Module):
             x_s = self.conv_s(self.norm_s(x, seg))
         else:
             x_s = x
+        if self.training:
+            x_s = self.bn0(x_s)
         dx = self.conv_0(self.activ(self.norm_0(x, seg)))
+        if self.training:
+            dx = self.bn0(dx)
         dx = self.conv_1(self.activ(self.norm_1(dx, seg)))
+        if self.training:
+            dx = self.bn1(dx)
         out = x_s + dx
         return out
