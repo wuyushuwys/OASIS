@@ -27,17 +27,16 @@ class fid_pytorch():
         self.path_to_save = os.path.join(self.opt.checkpoints_dir, self.opt.name, "FID")
         Path(self.path_to_save).mkdir(parents=True, exist_ok=True)
 
-    @torch.no_grad
     def compute_statistics_of_val_path(self, dataloader_val):
         if self.opt.rank == 0:
             print("--- Now computing Inception activations for real set ---")
-        pool = self.accumulate_inception_activations()
-        mu, sigma = torch.mean(pool, 0), torch_cov(pool, rowvar=False)
+        with torch.no_grad():
+            pool = self.accumulate_inception_activations()
+            mu, sigma = torch.mean(pool, 0), torch_cov(pool, rowvar=False)
         if self.opt.rank == 0:
             print("--- Finished FID stats for real set ---")
         return mu, sigma
 
-    @torch.no_grad
     def accumulate_inception_activations(self):
         pool, logits, labels = [], [], []
         self.model_inc.eval()
