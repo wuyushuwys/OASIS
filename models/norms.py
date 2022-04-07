@@ -83,8 +83,8 @@ def get_spectral_norm(opt):
 def get_norm_layer(opt, norm_nc):
     if opt.param_free_norm == 'instance':
         return nn.InstanceNorm2d(norm_nc, affine=False)
-    if opt.param_free_norm == 'syncbatch':
-        return SynchronizedBatchNorm2d(norm_nc, affine=False)
+    # if opt.param_free_norm == 'syncbatch':
+    #     return SynchronizedBatchNorm2d(norm_nc, affine=False)
     if opt.param_free_norm == 'batch':
         return nn.BatchNorm2d(norm_nc, affine=False)
     else:
