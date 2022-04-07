@@ -54,8 +54,8 @@ class CityscapesDataset(torch.utils.data.Dataset):
         assert image.size == label.size
         # resize
         new_width, new_height = (int(self.opt.load_size / self.opt.aspect_ratio), self.opt.load_size)
-        image = TR.functional.resize(image, (new_width, new_height), Image.BICUBIC)
-        label = TR.functional.resize(label, (new_width, new_height), Image.NEAREST)
+        image = TR.functional.resize(image, (new_width, new_height), Image.InterpolationMode.BICUBIC)
+        label = TR.functional.resize(label, (new_width, new_height), Image.InterpolationMode.NEAREST)
         # flip
         if not (self.opt.phase == "test" or self.opt.no_flip or self.for_metrics):
             if random.random() < 0.5:
