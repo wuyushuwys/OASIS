@@ -126,7 +126,7 @@ class OASIS_model(nn.Module):
 
 
 def put_on_multi_gpus(model, opt):
-    if opt.gpu_ids != "-1":
+    if torch.cuda.device_count() > 0:
         model = nn.SyncBatchNorm.convert_sync_batchnorm(model)
         model = DDP(model.cuda(), device_ids=[opt.local_rank], output_device=opt.local_rank,
                     find_unused_parameters=True)
@@ -135,7 +135,7 @@ def put_on_multi_gpus(model, opt):
         # model = DataParallelWithCallback(model, device_ids=gpus).cuda()
     else:
         model.module = model
-    assert len(opt.gpu_ids.split(",")) == 0 or opt.batch_size % len(opt.gpu_ids.split(",")) == 0
+    # assert len(opt.gpu_ids.split(",")) == 0 or opt.batch_size % len(opt.gpu_ids.split(",")) == 0
     return model
 
 
