@@ -26,7 +26,7 @@ if opt.gpu_ids != "-1":
 timer = utils.timer(opt)
 visualizer_losses = utils.losses_saver(opt)
 losses_computer = losses.losses_computer(opt)
-dataloader, dataloader_val = dataloaders.get_dataloaders(opt)
+dataloader, dataloader_val, train_sampler = dataloaders.get_dataloaders(opt)
 im_saver = utils.image_saver(opt)
 fid_computer = fid_pytorch(opt, dataloader_val)
 
@@ -42,6 +42,7 @@ optimizerD = torch.optim.Adam(model.module.netD.parameters(), lr=opt.lr_d, betas
 already_started = False
 start_epoch, start_iter = utils.get_start_iters(opt.loaded_latest_iter, len(dataloader))
 for epoch in range(start_epoch, opt.num_epochs):
+    train_sampler.set_epoch(epoch)
     for i, data_i in enumerate(dataloader):
         if not already_started and i < start_iter:
             continue
