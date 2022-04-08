@@ -75,17 +75,6 @@ for epoch in range(start_epoch, opt.num_epochs):
         # --- stats update ---#
         if not opt.no_EMA:
             utils.update_EMA(model, cur_iter, dataloader, opt)
-        # if cur_iter % opt.freq_print == 0:
-        #     im_saver.visualize_batch(model, image, label, cur_iter)
-        #     timer(epoch, cur_iter)
-        # if cur_iter % opt.freq_save_ckpt == 0:
-        #     utils.save_networks(opt, cur_iter, model)
-        # if cur_iter % opt.freq_save_latest == 0:
-        #     utils.save_networks(opt, cur_iter, model, latest=True)
-        # if cur_iter % opt.freq_fid == 0 and cur_iter > 0:
-        #     is_best = fid_computer.update(model, cur_iter)
-        #     if is_best:
-        #         utils.save_networks(opt, cur_iter, model, best=True)
         visualizer_losses(cur_iter, losses_G_list + losses_D_list)
 
     im_saver.visualize_batch(model, image, label, cur_iter)

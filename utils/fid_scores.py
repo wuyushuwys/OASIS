@@ -2,12 +2,13 @@ import os
 import numpy as np
 import torch
 import time
-from scipy import linalg # For numpy FID
+from scipy import linalg  # For numpy FID
 from pathlib import Path
 from PIL import Image
 import models.models as models
 from utils.fid_folder.inception import InceptionV3
 import matplotlib.pyplot as plt
+
 
 # --------------------------------------------------------------------------#
 # This code is an adapted version of https://github.com/mseitzer/pytorch-fid
@@ -120,10 +121,10 @@ class fid_pytorch():
 
         # Numerical error might give slight imaginary component
         if np.iscomplexobj(covmean):
-            #print('wat')
+            # print('wat')
             if not np.allclose(np.diagonal(covmean).imag, 0, atol=1e-3):
                 m = np.max(np.abs(covmean.imag))
-                #print('Imaginary component {}'.format(m))
+                # print('Imaginary component {}'.format(m))
             covmean = covmean.real
 
         tr_covmean = np.trace(covmean)
@@ -144,7 +145,7 @@ class fid_pytorch():
         return is_best
 
     def update_logs(self, cur_fid, epoch):
-        try :
+        try:
             np_file = np.load(self.path_to_save + "/fid_log.npy")
             first = list(np_file[0, :])
             sercon = list(np_file[1, :])

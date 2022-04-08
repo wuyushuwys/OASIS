@@ -47,8 +47,8 @@ class BatchNorm2dEval(nn.Module):
 class SPADE(nn.Module):
     def __init__(self, opt, norm_nc, label_nc):
         super().__init__()
-        # self.first_norm = get_norm_layer(opt, norm_nc)
-        self.first_norm = SynchronizedBatchNorm2d(norm_nc)
+        self.first_norm = get_norm_layer(opt, norm_nc)
+        # self.first_norm = SynchronizedBatchNorm2d(norm_nc)
         # self.first_norm_eval = nn.BatchNorm2d(affine=True)
         ks = opt.spade_ks
         nhidden = 128

@@ -1,13 +1,11 @@
 import torch
 import torch.nn as nn
-import models.norms as norms
 
 
 class OASIS_Discriminator(nn.Module):
     def __init__(self, opt):
         super().__init__()
         self.opt = opt
-        # sp_norm = norms.get_spectral_norm(opt)
         channels_D = opt.channels_D
         output_channel = opt.semantic_nc + 1 # for N+1 loss
         self.channels = [3,
@@ -18,12 +16,12 @@ class OASIS_Discriminator(nn.Module):
         self.body_down = nn.ModuleList([])
         # encoder part
         for i in range(opt.num_res_blocks):
-            self.body_down.append(residual_block_D(self.channels[i], self.channels[i+1], opt, -1, first=(i==0)))
+            self.body_down.append(residual_block_D(self.channels[i], self.channels[i+1], -1, first=(i==0)))
         # decoder part
-        self.body_up.append(residual_block_D(self.channels[-1], self.channels[-2], opt, 1))
+        self.body_up.append(residual_block_D(self.channels[-1], self.channels[-2], 1))
         for i in range(1, opt.num_res_blocks-1):
-            self.body_up.append(residual_block_D(2*self.channels[-1-i], self.channels[-2-i], opt, 1))
-        self.body_up.append(residual_block_D(2*self.channels[1], 64, opt, 1))
+            self.body_up.append(residual_block_D(2*self.channels[-1-i], self.channels[-2-i], 1))
+        self.body_up.append(residual_block_D(2*self.channels[1], 64, 1))
         self.layer_up_last = nn.Conv2d(64, output_channel, 1, 1, 0)
 
     def forward(self, input):
@@ -42,14 +40,13 @@ class OASIS_Discriminator(nn.Module):
 
 
 class residual_block_D(nn.Module):
-    def __init__(self, fin, fout, opt, up_or_down, first=False):
+    def __init__(self, fin, fout, up_or_down, first=False):
         super().__init__()
         # Attributes
         self.up_or_down = up_or_down
         self.first = first
         self.learned_shortcut = (fin != fout)
         fmiddle = fout
-        # norm_layer = norms.get_spectral_norm(opt)
         norm_layer = nn.utils.spectral_norm
         if first:
             self.conv1 = nn.Sequential(norm_layer(nn.Conv2d(fin, fmiddle, 3, 1, 1)))

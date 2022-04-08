@@ -52,17 +52,16 @@ class ResnetBlock_with_SPADE(nn.Module):
         self.opt = opt
         self.learned_shortcut = (fin != fout)
         fmiddle = min(fin, fout)
-        # sp_norm = norms.get_spectral_norm(opt)
-        # self.conv_0 = sp_norm(nn.Conv2d(fin, fmiddle, kernel_size=3, padding=1))
-        # self.conv_1 = sp_norm(nn.Conv2d(fmiddle, fout, kernel_size=3, padding=1))
-        self.conv_0 = nn.Conv2d(fin, fmiddle, kernel_size=3, padding=1)
-        self.bn0 = nn.BatchNorm2d(fmiddle, affine=False)
-        self.conv_1 = nn.Conv2d(fmiddle, fout, kernel_size=3, padding=1)
-        self.bn1 = nn.BatchNorm2d(fout, affine=False)
+        sp_norm = norms.get_spectral_norm(opt)
+        self.use_sp = not isinstance(sp_norm, norms.Identity)
+        self.conv_0 = sp_norm(nn.Conv2d(fin, fmiddle, kernel_size=3, padding=1))
+        #     self.bn0 = nn.BatchNorm2d(fmiddle, affine=False)
+        self.conv_1 = sp_norm(nn.Conv2d(fmiddle, fout, kernel_size=3, padding=1))
+        # self.bn1 = nn.BatchNorm2d(fout, affine=False)
         if self.learned_shortcut:
-            # self.conv_s = sp_norm(nn.Conv2d(fin, fout, kernel_size=1, bias=False))
-            self.conv_s = nn.Conv2d(fin, fout, kernel_size=1, bias=False)
-            self.bn_s = nn.BatchNorm2d(fout)
+            self.conv_s = sp_norm(nn.Conv2d(fin, fout, kernel_size=1, bias=False))
+            # self.conv_s = nn.Conv2d(fin, fout, kernel_size=1, bias=False)
+            # self.bn_s = nn.BatchNorm2d(fout)
 
         spade_conditional_input_dims = opt.semantic_nc
         if not opt.no_3dnoise:
@@ -79,13 +78,13 @@ class ResnetBlock_with_SPADE(nn.Module):
             x_s = self.conv_s(self.norm_s(x, seg))
         else:
             x_s = x
-        if self.training:
-            x_s = self.bn0(x_s)
+        # if self.training:
+        #     x_s = self.bn0(x_s)
         dx = self.conv_0(self.activ(self.norm_0(x, seg)))
-        if self.training:
-            dx = self.bn0(dx)
+        # if self.training:
+        #     dx = self.bn0(dx)
         dx = self.conv_1(self.activ(self.norm_1(dx, seg)))
-        if self.training:
-            dx = self.bn1(dx)
+        # if self.training:
+        #     dx = self.bn1(dx)
         out = x_s + dx
         return out
