@@ -61,10 +61,10 @@ class SPADE(nn.Module):
         self.mlp_beta = nn.Conv2d(nhidden, norm_nc, kernel_size=ks, padding=pw)
 
     def forward(self, x, segmap):
-        if self.training:
-            normalized = self.first_norm(x)
-        else:
-            normalized = x
+        # if self.training:
+        normalized = self.first_norm(x)
+        # else:
+        #     normalized = x
         segmap = F.interpolate(segmap, size=x.size()[2:], mode='nearest')
         actv = self.mlp_shared(segmap)
         gamma = self.mlp_gamma(actv)
