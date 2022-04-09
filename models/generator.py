@@ -55,13 +55,9 @@ class ResnetBlock_with_SPADE(nn.Module):
         sp_norm = norms.get_spectral_norm(opt)
         self.use_sp = not isinstance(sp_norm, norms.Identity)
         self.conv_0 = sp_norm(nn.Conv2d(fin, fmiddle, kernel_size=3, padding=1))
-        #     self.bn0 = nn.BatchNorm2d(fmiddle, affine=False)
         self.conv_1 = sp_norm(nn.Conv2d(fmiddle, fout, kernel_size=3, padding=1))
-        # self.bn1 = nn.BatchNorm2d(fout, affine=False)
         if self.learned_shortcut:
             self.conv_s = sp_norm(nn.Conv2d(fin, fout, kernel_size=1, bias=False))
-            # self.conv_s = nn.Conv2d(fin, fout, kernel_size=1, bias=False)
-            # self.bn_s = nn.BatchNorm2d(fout)
 
         spade_conditional_input_dims = opt.semantic_nc
         if not opt.no_3dnoise:

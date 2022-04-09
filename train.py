@@ -12,7 +12,6 @@ from config import print_options, save_options
 # --- read options ---#
 opt, parser = config.read_arguments(train=True)
 
-
 if opt.gpu_ids != "-1":
     local_rank = int(os.environ["LOCAL_RANK"])
     opt.local_rank = local_rank
@@ -49,13 +48,13 @@ optimizerD = torch.optim.Adam(model.module.netD.parameters(), lr=opt.lr_d, betas
 # --- the training loop ---#
 already_started = False
 start_epoch, start_iter = utils.get_start_iters(opt.loaded_latest_iter, len(dataloader))
-for epoch in range(start_epoch, opt.num_epochs):
+for epoch in range(start_epoch + 1, opt.num_epochs + 1):
     train_sampler.set_epoch(epoch)
-    for i, data_i in enumerate(dataloader):
+    for i, data_i in enumerate(dataloader, start=1):
         if not already_started and i < start_iter:
             continue
         already_started = True
-        cur_iter = epoch * len(dataloader) + i
+        cur_iter = (epoch - 1) * len(dataloader) + i
         image, label = models.preprocess_input(opt, data_i)
 
         # --- generator update ---#
