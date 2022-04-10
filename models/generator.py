@@ -8,7 +8,6 @@ class OASIS_Generator(nn.Module):
     def __init__(self, opt):
         super().__init__()
         self.opt = opt
-        # sp_norm = norms.get_spectral_norm(opt)
         ch = opt.channels_G
         self.channels = [16*ch, 16*ch, 16*ch, 8*ch, 4*ch, 2*ch, 1*ch]
         self.init_W, self.init_H = self.compute_latent_vector_size(opt)
@@ -74,13 +73,7 @@ class ResnetBlock_with_SPADE(nn.Module):
             x_s = self.conv_s(self.norm_s(x, seg))
         else:
             x_s = x
-        # if self.training:
-        #     x_s = self.bn0(x_s)
         dx = self.conv_0(self.activ(self.norm_0(x, seg)))
-        # if self.training:
-        #     dx = self.bn0(dx)
         dx = self.conv_1(self.activ(self.norm_1(dx, seg)))
-        # if self.training:
-        #     dx = self.bn1(dx)
         out = x_s + dx
         return out
