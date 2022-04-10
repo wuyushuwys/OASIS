@@ -28,7 +28,7 @@ class OASIS_model(nn.Module):
         #--- perceptual loss ---#
         if opt.phase == "train":
             if opt.add_vgg_loss:
-                self.VGG_loss = losses.VGGLoss(self.opt.gpu_ids)
+                self.VGG_loss = losses.VGGLoss().cuda()
 
     def forward(self, image, label, mode, losses_computer):
         # Branching is applied to be compatible with DataParallel
@@ -130,12 +130,8 @@ def put_on_multi_gpus(model, opt):
         model = nn.SyncBatchNorm.convert_sync_batchnorm(model)
         model = DDP(model.cuda(), device_ids=[opt.local_rank], output_device=opt.local_rank,
                     find_unused_parameters=True)
-
-        # gpus = list(map(int, opt.gpu_ids.split(",")))
-        # model = DataParallelWithCallback(model, device_ids=gpus).cuda()
     else:
         model.module = model
-    # assert len(opt.gpu_ids.split(",")) == 0 or opt.batch_size % len(opt.gpu_ids.split(",")) == 0
     return model
 
 

@@ -20,7 +20,7 @@ class fid_pytorch():
         self.dims = 2048
         block_idx = InceptionV3.BLOCK_INDEX_BY_DIM[self.dims]
         self.model_inc = InceptionV3([block_idx])
-        if opt.gpu_ids != "-1":
+        if opt.distributed:
             self.model_inc.to(opt.local_rank)
         self.val_dataloader = dataloader_val
         self.m1, self.s1 = self.compute_statistics_of_val_path(dataloader_val)
@@ -44,7 +44,7 @@ class fid_pytorch():
         with torch.no_grad():
             for i, data_i in enumerate(self.val_dataloader):
                 image = data_i["image"]
-                if self.opt.gpu_ids != "-1":
+                if self.opt.distributed:
                     image = image.cuda()
                 image = (image + 1) / 2
                 pool_val = self.model_inc(image.float())[0][:, :, 0, 0]

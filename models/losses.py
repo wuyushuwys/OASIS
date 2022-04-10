@@ -54,7 +54,7 @@ def get_n1_target(opt, input, label, target_is_real):
 
 
 def get_target_tensor(opt, input, target_is_real):
-    if opt.gpu_ids != "-1":
+    if opt.distributed:
         if target_is_real:
             return torch.cuda.FloatTensor(1).fill_(1.0).requires_grad_(False).expand_as(input)
         else:
@@ -67,7 +67,7 @@ def get_target_tensor(opt, input, target_is_real):
 
 
 class VGGLoss(nn.Module):
-    def __init__(self, gpu_ids):
+    def __init__(self):
         super(VGGLoss, self).__init__()
         self.vgg = VGG19()
         self.criterion = nn.L1Loss()

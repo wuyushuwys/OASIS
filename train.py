@@ -12,12 +12,21 @@ from config import print_options, save_options
 # --- read options ---#
 opt, parser = config.read_arguments(train=True)
 
-if opt.gpu_ids != "-1":
+opt.distributed = torch.cuda.device_count() > 1
+
+if opt.distributed:
     local_rank = int(os.environ["LOCAL_RANK"])
-    opt.local_rank = local_rank
-    opt.world_size = int(os.environ["WORLD_SIZE"])
-    opt.rank = local_rank
-    device = local_rank
+    if 'SLURM_NPROCS' in os.environ:
+        ngpus_per_node = torch.cuda.device_count()
+        opt.world_size = int(os.environ['SLURM_NPROCS']) * ngpus_per_node
+        os.environ['MASTER_ADDR'] = os.environ['SLURM_LAUNCH_NODE_IPADDR']
+        opt.rank =  int(os.environ['SLURM_PROCID']) * ngpus_per_node + local_rank
+        opt.node_list = os.environ["SLURM_NODELIST"]
+        opt.local_rank = local_rank
+    else:
+        opt.local_rank = local_rank
+        opt.world_size = int(os.environ["WORLD_SIZE"])
+        opt.rank = local_rank
     torch.cuda.set_device(local_rank)
     torch.distributed.init_process_group(backend=opt.dist_backend,
                                          init_method=opt.dist_url,
