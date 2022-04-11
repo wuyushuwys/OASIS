@@ -27,7 +27,6 @@ def add_all_arguments(parser, train):
     parser.add_argument('--dist-backend', default='nccl', type=str, help='distributed backend')
     parser.add_argument('--name', type=str, default='label2coco', help='name of the experiment. It decides where to store samples and models')
     parser.add_argument('--seed', type=int, default=42, help='random seed')
-    parser.add_argument('--gpu_ids', type=str, default='0', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
     parser.add_argument('--checkpoints_dir', type=str, default='./checkpoints', help='models are saved here')
     parser.add_argument('--no_spectral_norm', action='store_true', help='this option deactivates spectral norm in all layers')
     parser.add_argument('--batch_size', type=int, default=1, help='input batch size')
