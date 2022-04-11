@@ -18,9 +18,6 @@ if opt.distributed:
     local_rank = int(os.environ["LOCAL_RANK"])
     if 'SLURM_NPROCS' in os.environ:
         ngpus_per_node = torch.cuda.device_count()
-        print("#GPU", ngpus_per_node)
-        print("SLURM_NPROCS", int(os.environ['SLURM_NPROCS']))
-        print("SLURM_PROCID", int(os.environ['SLURM_PROCID']))
         opt.world_size = int(os.environ['SLURM_NPROCS']) * ngpus_per_node
         os.environ['MASTER_ADDR'] = os.environ['SLURM_LAUNCH_NODE_IPADDR']
         opt.rank = int(os.environ['SLURM_PROCID']) * ngpus_per_node + local_rank
