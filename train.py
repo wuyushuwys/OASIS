@@ -23,7 +23,6 @@ if opt.distributed:
         opt.rank = int(os.environ['SLURM_PROCID']) * ngpus_per_node + local_rank
         opt.node_list = os.environ["SLURM_NODELIST"]
         opt.local_rank = local_rank
-        print(f"Rank: {opt.rank}, Local Rank: {opt.local_rank}")
     else:
         opt.local_rank = local_rank
         opt.world_size = int(os.environ["WORLD_SIZE"])
