@@ -20,13 +20,15 @@ if opt.distributed:
         ngpus_per_node = torch.cuda.device_count()
         opt.world_size = int(os.environ['SLURM_NPROCS']) * ngpus_per_node
         os.environ['MASTER_ADDR'] = os.environ['SLURM_LAUNCH_NODE_IPADDR']
-        opt.rank =  int(os.environ['SLURM_PROCID']) * ngpus_per_node + local_rank
+        opt.rank = int(os.environ['SLURM_PROCID']) * ngpus_per_node + local_rank
         opt.node_list = os.environ["SLURM_NODELIST"]
         opt.local_rank = local_rank
+        print(f"Rank: {opt.rank}, Local Rank: {opt.local_rank}")
     else:
         opt.local_rank = local_rank
         opt.world_size = int(os.environ["WORLD_SIZE"])
         opt.rank = local_rank
+    print(f"Init for Rank: {opt.rank}, Local Rank: {opt.local_rank}")
     torch.cuda.set_device(local_rank)
     torch.distributed.init_process_group(backend=opt.dist_backend,
                                          init_method=opt.dist_url,
