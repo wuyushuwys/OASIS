@@ -86,7 +86,7 @@ for epoch in range(start_epoch + 1, opt.num_epochs + 1):
             utils.update_EMA(model, cur_iter, dataloader, opt)
         visualizer_losses(cur_iter, losses_G_list + losses_D_list)
 
-    im_saver.visualize_batch(model, image, label, cur_iter)
+    im_saver.visualize_batch(model, image, label)
     timer(epoch, cur_iter)
     utils.save_networks(opt, cur_iter, model, latest=True)
     if epoch % 2 == 0 and cur_iter > 0 and opt.rank == 0:
