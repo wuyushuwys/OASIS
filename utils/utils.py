@@ -204,20 +204,11 @@ class image_saver():
 
         if is_label:
             b, h, w, _ = batch.size()
-            tmp = torch.ones((b, h, w, 3))
+            tmp = torch.ones((b, 3, h, w))
             for id, im in enumerate(batch):
-                tmp[id]  = tens_to_lab(im, self.num_cl)
+                tmp[id, ...]  = tens_to_lab(im, self.num_cl)
             batch = tmp
-            # fig = plt.figure()
-            # for i in range(min(self.rows * self.cols, len(batch))):
-            #     im = tens_to_lab(batch[i], self.num_cl)
-            #     plt.axis("off")
-            #     fig.add_subplot(self.rows, self.cols, i + 1)
-            #     plt.axis("off")
-            #     plt.imshow(im)
-            # fig.tight_layout()
-            # plt.savefig(self.path + "_" + name)
-            # plt.close()
+
         save_image(batch, self.path + "_" + name)
 
 
@@ -228,7 +219,9 @@ def tens_to_im(tens):
 
 
 def tens_to_lab(tens, num_cl):
+    # print(tens.shape)
     label_tensor = Colorize(tens, num_cl)
+    # print(label_tensor.shape)
     # label_numpy = np.transpose(label_tensor.numpy(), (1, 2, 0))
     return label_tensor
 
