@@ -200,11 +200,14 @@ class image_saver():
                 self.save_images(fake, "fake_ema")
                 model.train()
 
-    def save_images(self, batch, name, is_label=False):
+    def save_images(self, batch: torch.Tensor, name, is_label=False):
 
         if is_label:
+            b, h, w, _ = batch.size()
+            tmp = torch.ones((b, h, w, 3))
             for id, im in enumerate(batch):
-                batch[id]  = tens_to_lab(im, self.num_cl)
+                tmp[id]  = tens_to_lab(im, self.num_cl)
+            batch = tmp
             # fig = plt.figure()
             # for i in range(min(self.rows * self.cols, len(batch))):
             #     im = tens_to_lab(batch[i], self.num_cl)
